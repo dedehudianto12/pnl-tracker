@@ -1,0 +1,201 @@
+// prisma/schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================
+// USER MODEL
+// ============================================
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String   // bcrypt hashed
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  ownedProjects  Project[]       @relation("ProjectOwner")
+  projectMembers ProjectMember[]
+  notifications Notification[]
+}
+
+// ============================================
+// PROJECT MODEL
+// ============================================
+model Project {
+  id                 String        @id @default(cuid())
+  ownerId            String
+  owner              User          @relation("ProjectOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+  
+  // Project Details
+  name               String
+  description        String?
+  projectValue       Decimal       @db.Decimal(15, 2) // Total budget
+  deadline           DateTime
+  overheadPercentage Decimal?      @db.Decimal(5, 2) // e.g., 10.00 for 10%
+  currency           String        @default("USD") // USD, IDR, etc.
+  status             ProjectStatus @default(ACTIVE)
+  
+  createdAt          DateTime      @default(now())
+  updatedAt          DateTime      @updatedAt
+
+  // Relations
+  members    ProjectMember[]
+  expenses   Expense[]
+  milestones Milestone[]
+  notifications Notification[]
+
+  @@index([ownerId])
+}
+
+enum ProjectStatus {
+  DRAFT
+  ACTIVE
+  COMPLETED
+  ARCHIVED
+}
+
+// ============================================
+// PROJECT MEMBERSHIP (Join Table)
+// ============================================
+model ProjectMember {
+  id        String     @id @default(cuid())
+  projectId String
+  project   Project    @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role      MemberRole @default(MEMBER)
+  
+  addedAt   DateTime   @default(now())
+
+  @@unique([projectId, userId]) // One user can't be added twice to same project
+  @@index([userId])
+  @@index([projectId])
+}
+
+enum MemberRole {
+  MEMBER // Can view and add expenses
+  EDITOR // Can edit everything except delete project
+  VIEWER // Read-only
+}
+
+// ============================================
+// EXPENSE MODEL
+// ============================================
+model Expense {
+  id            String              @id @default(cuid())
+  projectId     String
+  project       Project             @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  
+  // Expense Details
+  category      ExpenseCategory
+  name          String
+  description   String?
+  estimatedCost Decimal             @db.Decimal(15, 2)
+  actualCost    Decimal?            @db.Decimal(15, 2) // Null until actual cost is known
+  
+  // Recurring Expenses
+  isRecurring   Boolean             @default(false)
+  recurringInterval RecurringInterval?
+  
+  // Tracking
+  dateIncurred  DateTime?           // When the expense actually happened
+  createdAt     DateTime            @default(now())
+  updatedAt     DateTime            @updatedAt
+
+  @@index([projectId])
+  @@index([category])
+}
+
+enum ExpenseCategory {
+  MATERIALS
+  MANPOWER
+  TOOLS
+  OTHER
+}
+
+enum RecurringInterval {
+  DAILY
+  WEEKLY
+  MONTHLY
+}
+
+// ============================================
+// MILESTONE MODEL
+// ============================================
+model Milestone {
+  id                   String          @id @default(cuid())
+  projectId            String
+  project              Project         @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  
+  // Milestone Details
+  name                 String
+  description          String?
+  targetDate           DateTime
+  completionPercentage Int             @default(0) // 0-100
+  status               MilestoneStatus @default(PENDING)
+  
+  // Time Tracking (optional for now)
+  estimatedHours       Int?
+  actualHours          Int?
+  
+  createdAt            DateTime        @default(now())
+  updatedAt            DateTime        @updatedAt
+
+  @@index([projectId])
+}
+
+enum MilestoneStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  DELAYED
+}
+
+
+// ============================================
+// NOTIFICATION MODEL
+// ============================================
+
+enum NotificationType {
+  BUDGET_WARNING_50
+  BUDGET_WARNING_75
+  BUDGET_WARNING_90
+  BUDGET_EXCEEDED
+  DEADLINE_WARNING
+  MILESTONE_DELAYED
+  PROJECT_COMPLETED
+}
+
+enum NotificationStatus {
+  UNREAD
+  READ
+  ARCHIVED
+}
+
+model Notification {
+  id          String             @id @default(cuid())
+  userId      String
+  user        User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  projectId   String?
+  project     Project?           @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  
+  type        NotificationType
+  title       String
+  message     String
+  status      NotificationStatus @default(UNREAD)
+  metadata    Json?              // Additional data (percentage, amount, etc.)
+  
+  createdAt   DateTime           @default(now())
+  readAt      DateTime?
+
+  @@index([userId, status])
+  @@index([projectId])
+}
