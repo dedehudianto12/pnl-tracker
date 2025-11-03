@@ -1,18 +1,34 @@
+// __tests__/globalSetup.ts
 import * as dotenv from "dotenv";
 import * as path from "path";
-import { prisma } from "./testPrismaClient.ts"; // Import the clean client
+import { execSync } from "child_process";
 
-// The default export must be an async function.
 export default async function globalSetup() {
   console.log("🛠️ Running global setup: Loading ENV and preparing database.");
 
-  // 1. Load test environment variables (e.g., DATABASE_URL)
-  // Assumes you have a separate .env.test file for your test database.
+  // Load test environment variables
   dotenv.config({ path: path.resolve(process.cwd(), ".env.test") });
 
-  // 2. Add your database setup logic here (e.g., run migrations or schema push)
-  // await prisma.$executeRaw`CREATE SCHEMA IF NOT EXISTS "test_schema"`;
+  // Verify we're using test database
+  const dbUrl = process.env.DATABASE_URL;
+  if (!dbUrl?.includes("test")) {
+    throw new Error(
+      '⚠️  DATABASE_URL must contain "test" to prevent accidental production DB usage!'
+    );
+  }
 
-  // Ensure the connection is closed after setup
-  await prisma.$disconnect();
+  console.log(`📦 Using database: ${dbUrl?.split("@")[1]}`);
+
+  try {
+    // Push Prisma schema to test database
+    console.log("🔄 Pushing Prisma schema...");
+    execSync("npx prisma db push --force-reset --skip-generate", {
+      stdio: "inherit",
+      env: { ...process.env, DATABASE_URL: dbUrl },
+    });
+    console.log("✅ Database schema ready");
+  } catch (error) {
+    console.error("❌ Failed to setup database:", error);
+    throw error;
+  }
 }

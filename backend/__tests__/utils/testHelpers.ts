@@ -1,7 +1,7 @@
 import { faker } from "@faker-js/faker";
 import bcrypt from "bcryptjs";
 import { generateToken } from "../../src/utils/jwt.js";
-import { prisma } from "../testPrismaClient.ts";
+import { prisma } from "../testPrismaClient.js";
 
 export const createTestUser = async (overrides: any = {}) => {
   try {
@@ -74,6 +74,8 @@ export const createTestMilestone = async (
 export const generateAuthToken = (userId: string, email: string) => {
   return generateToken({ userId, email });
 };
+
+export { prisma };
 
 // Note: `prisma` is imported from `__tests__/setup.ts` to reuse the same PrismaClient
 // instance that runs the test database setup/teardown. Do not create additional

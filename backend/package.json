@@ -12,12 +12,12 @@
     "prisma:migrate": "prisma migrate dev",
     "prisma:studio": "prisma studio",
     "prisma:deploy": "prisma migrate deploy",
-    "test": "cross-env NODE_OPTIONS=--experimental-vm-modules jest",
-    "test:watch": "cross-env NODE_OPTIONS=--experimental-vm-modules jest --watch",
-    "test:coverage": "cross-env NODE_OPTIONS=--experimental-vm-modules jest --coverage",
-    "test:unit": "cross-env NODE_OPTIONS=--experimental-vm-modules jest __tests__/utils __tests__/services",
-    "test:integration": "cross-env NODE_OPTIONS=--experimental-vm-modules jest __tests__/integration",
-    "test:e2e": "cross-env NODE_OPTIONS=--experimental-vm-modules jest __tests__/e2e"
+    "test": "cross-env NODE_OPTIONS=--experimental-vm-modules jest --maxWorkers=1",
+    "test:watch": "cross-env NODE_OPTIONS=--experimental-vm-modules jest --watch --maxWorkers=1",
+    "test:coverage": "cross-env NODE_OPTIONS=--experimental-vm-modules jest --coverage --maxWorkers=1",
+    "test:unit": "cross-env NODE_OPTIONS=--experimental-vm-modules jest __tests__/utils --maxWorkers=50%",
+    "test:integration": "cross-env NODE_OPTIONS=--experimental-vm-modules jest __tests__/integration __tests__/services --maxWorkers=1",
+    "test:e2e": "cross-env NODE_OPTIONS=--experimental-vm-modules jest __tests__/e2e --maxWorkers=1"
   },
   "keywords": [],
   "author": "",

@@ -1,16 +1,31 @@
-import { prisma } from "./testPrismaClient.ts"; // Import the clean client
+// __tests__/setup.ts
+import { prisma } from "./testPrismaClient.js";
 
-// Since this file runs within the Jest environment, globals like 'beforeEach' are available.
-
-// Example: Clear the database before each test to ensure test isolation
+// Clear database before each test for isolation
 beforeEach(async () => {
-  // Add logic to delete data from tables to reset the state.
-  // await prisma.user.deleteMany();
-  // You can also use $executeRaw for truncation if supported by your database:
-  // await prisma.$executeRaw`TRUNCATE TABLE "User" CASCADE;`;
+  // Delete in order to avoid foreign key constraint issues
+  const tables = [
+    "Notification",
+    "Milestone",
+    "Expense",
+    "ProjectMember",
+    "Project",
+    "User",
+  ];
+
+  // Use transaction for faster cleanup
+  await prisma.$transaction(
+    tables.map((table) =>
+      prisma.$executeRawUnsafe(
+        `TRUNCATE TABLE "${table}" RESTART IDENTITY CASCADE;`
+      )
+    )
+  );
 });
 
-// Example: Any cleanup needed after all tests in a single file finish
+// Disconnect after all tests in a file
 afterAll(async () => {
-  // Example: Reset specific global state or close a mock server.
+  await prisma.$disconnect();
 });
+
+export { prisma };

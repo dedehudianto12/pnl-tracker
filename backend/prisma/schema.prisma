@@ -15,7 +15,7 @@ datasource db {
 model User {
   id        String   @id @default(cuid())
   email     String   @unique
-  password  String   // bcrypt hashed
+  password  String // bcrypt hashed
   name      String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -23,17 +23,17 @@ model User {
   // Relations
   ownedProjects  Project[]       @relation("ProjectOwner")
   projectMembers ProjectMember[]
-  notifications Notification[]
+  notifications  Notification[]
 }
 
 // ============================================
 // PROJECT MODEL
 // ============================================
 model Project {
-  id                 String        @id @default(cuid())
-  ownerId            String
-  owner              User          @relation("ProjectOwner", fields: [ownerId], references: [id], onDelete: Cascade)
-  
+  id      String @id @default(cuid())
+  ownerId String
+  owner   User   @relation("ProjectOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+
   // Project Details
   name               String
   description        String?
@@ -42,14 +42,14 @@ model Project {
   overheadPercentage Decimal?      @db.Decimal(5, 2) // e.g., 10.00 for 10%
   currency           String        @default("USD") // USD, IDR, etc.
   status             ProjectStatus @default(ACTIVE)
-  
-  createdAt          DateTime      @default(now())
-  updatedAt          DateTime      @updatedAt
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   // Relations
-  members    ProjectMember[]
-  expenses   Expense[]
-  milestones Milestone[]
+  members       ProjectMember[]
+  expenses      Expense[]
+  milestones    Milestone[]
   notifications Notification[]
 
   @@index([ownerId])
@@ -72,8 +72,8 @@ model ProjectMember {
   userId    String
   user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
   role      MemberRole @default(MEMBER)
-  
-  addedAt   DateTime   @default(now())
+
+  addedAt DateTime @default(now())
 
   @@unique([projectId, userId]) // One user can't be added twice to same project
   @@index([userId])
@@ -90,25 +90,25 @@ enum MemberRole {
 // EXPENSE MODEL
 // ============================================
 model Expense {
-  id            String              @id @default(cuid())
-  projectId     String
-  project       Project             @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  
+  id        String  @id @default(cuid())
+  projectId String
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
   // Expense Details
   category      ExpenseCategory
   name          String
   description   String?
-  estimatedCost Decimal             @db.Decimal(15, 2)
-  actualCost    Decimal?            @db.Decimal(15, 2) // Null until actual cost is known
-  
+  estimatedCost Decimal         @db.Decimal(15, 2)
+  actualCost    Decimal?        @db.Decimal(15, 2) // Null until actual cost is known
+
   // Recurring Expenses
-  isRecurring   Boolean             @default(false)
+  isRecurring       Boolean            @default(false)
   recurringInterval RecurringInterval?
-  
+
   // Tracking
-  dateIncurred  DateTime?           // When the expense actually happened
-  createdAt     DateTime            @default(now())
-  updatedAt     DateTime            @updatedAt
+  dateIncurred DateTime? // When the expense actually happened
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
 
   @@index([projectId])
   @@index([category])
@@ -131,23 +131,23 @@ enum RecurringInterval {
 // MILESTONE MODEL
 // ============================================
 model Milestone {
-  id                   String          @id @default(cuid())
-  projectId            String
-  project              Project         @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  
+  id        String  @id @default(cuid())
+  projectId String
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
   // Milestone Details
   name                 String
   description          String?
   targetDate           DateTime
   completionPercentage Int             @default(0) // 0-100
   status               MilestoneStatus @default(PENDING)
-  
+
   // Time Tracking (optional for now)
-  estimatedHours       Int?
-  actualHours          Int?
-  
-  createdAt            DateTime        @default(now())
-  updatedAt            DateTime        @updatedAt
+  estimatedHours Int?
+  actualHours    Int?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([projectId])
 }
@@ -158,7 +158,6 @@ enum MilestoneStatus {
   COMPLETED
   DELAYED
 }
-
 
 // ============================================
 // NOTIFICATION MODEL
@@ -172,6 +171,15 @@ enum NotificationType {
   DEADLINE_WARNING
   MILESTONE_DELAYED
   PROJECT_COMPLETED
+  ACCOUNT_CREATED
+  PASSWORD_CHANGED
+  EMAIL_VERIFIED
+  PROFILE_UPDATED
+  MEMBER_JOINED
+  MEMBER_LEFT
+  ROLE_CHANGED
+  SYSTEM_MAINTENANCE
+  FEATURE_RELEASED
 }
 
 enum NotificationStatus {
@@ -181,20 +189,20 @@ enum NotificationStatus {
 }
 
 model Notification {
-  id          String             @id @default(cuid())
-  userId      String
-  user        User               @relation(fields: [userId], references: [id], onDelete: Cascade)
-  projectId   String?
-  project     Project?           @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  
-  type        NotificationType
-  title       String
-  message     String
-  status      NotificationStatus @default(UNREAD)
-  metadata    Json?              // Additional data (percentage, amount, etc.)
-  
-  createdAt   DateTime           @default(now())
-  readAt      DateTime?
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  projectId String?
+  project   Project? @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  type     NotificationType
+  title    String
+  message  String
+  status   NotificationStatus @default(UNREAD)
+  metadata Json? // Additional data (percentage, amount, etc.)
+
+  createdAt DateTime  @default(now())
+  readAt    DateTime?
 
   @@index([userId, status])
   @@index([projectId])
