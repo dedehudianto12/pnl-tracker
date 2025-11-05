@@ -1,361 +1,329 @@
 <template>
-  <div v-if="pending" class="flex items-center justify-center py-12">
-    <Icon name="lucide:loader-2" class="h-8 w-8 animate-spin text-primary" />
-  </div>
-
-  <div v-else-if="project" class="space-y-6">
+  <div class="space-y-6">
     <!-- Header -->
-    <div>
-      <Button variant="ghost" size="sm" @click="navigateTo('/projects')">
-        <Icon name="lucide:arrow-left" class="mr-2 h-4 w-4" />
-        Back to Projects
-      </Button>
-
-      <div class="flex items-start justify-between mt-4">
-        <div>
-          <div class="flex items-center gap-3">
-            <h1 class="text-3xl font-bold tracking-tight">
-              {{ project.name }}
-            </h1>
-            <Badge :variant="statusVariant">{{ project.status }}</Badge>
-          </div>
-          <p class="text-muted-foreground mt-1">
-            {{ project.description || "No description" }}
-          </p>
-        </div>
-        <DropdownMenu>
-          <DropdownMenuTrigger as-child>
-            <Button variant="outline" size="icon">
-              <Icon name="lucide:more-vertical" class="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem
-              @click="navigateTo(`/projects/${project.id}/edit`)"
-              :disabled="!isOwner"
-            >
-              <Icon name="lucide:edit" class="mr-2 h-4 w-4" />
-              Edit Project
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem class="text-destructive" @click="handleDelete">
-              <Icon name="lucide:trash" class="mr-2 h-4 w-4" />
-              Delete Project
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+    <div class="flex items-center justify-between">
+      <div>
+        <Button
+          variant="ghost"
+          size="sm"
+          @click="navigateTo('/projects')"
+          class="mb-2"
+        >
+          <Icon name="lucide:arrow-left" class="mr-2 h-4 w-4" />
+          Back to Projects
+        </Button>
+        <h1 class="text-3xl font-bold tracking-tight">
+          {{ project?.name || "Project Details" }}
+        </h1>
+        <p class="text-muted-foreground mt-1">
+          {{
+            project?.description || "Manage your project expenses and revenue"
+          }}
+        </p>
+      </div>
+      <div class="flex gap-2">
+        <Button
+          variant="outline"
+          @click="navigateTo(`/projects/${route.params.id}/edit`)"
+        >
+          <Icon name="lucide:edit" class="mr-2 h-4 w-4" />
+          Edit Project
+        </Button>
       </div>
     </div>
 
-    <!-- Budget Alert -->
-    <Alert v-if="project.alerts?.budget" :variant="alertVariant">
-      <Icon :name="alertIcon" class="h-4 w-4" />
-      <AlertTitle>{{ alertTitle }}</AlertTitle>
-      <AlertDescription>{{ project.alerts.budget.message }}</AlertDescription>
-    </Alert>
-
-    <!-- Stats Cards -->
-    <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-      <Card>
-        <CardHeader class="pb-3">
-          <CardTitle class="text-sm font-medium text-muted-foreground">
-            Total Budget
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div class="text-2xl font-bold">
-            {{ formatCurrency(Number(project.projectValue), project.currency) }}
-          </div>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader class="pb-3">
-          <CardTitle class="text-sm font-medium text-muted-foreground">
-            Total Spent
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div class="text-2xl font-bold">
-            {{
-              formatCurrency(
-                project.calculations?.totalActualCost || 0,
-                project.currency
-              )
-            }}
-          </div>
-          <p class="text-xs text-muted-foreground mt-1">
-            {{ project.alerts?.budget?.percentage.toFixed(1) }}% of budget
-          </p>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader class="pb-3">
-          <CardTitle class="text-sm font-medium text-muted-foreground">
-            Profit
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div :class="['text-2xl font-bold', profitColor]">
-            {{
-              formatCurrency(
-                project.calculations?.profit || 0,
-                project.currency
-              )
-            }}
-          </div>
-          <p class="text-xs text-muted-foreground mt-1">
-            {{ (project.calculations?.profitMargin || 0).toFixed(1) }}% margin
-          </p>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader class="pb-3">
-          <CardTitle class="text-sm font-medium text-muted-foreground">
-            Deadline
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div class="text-2xl font-bold">
-            {{ formatDate(project.deadline) }}
-          </div>
-          <p :class="['text-xs mt-1', deadlineColor]">
-            {{ daysRemainingText }}
-          </p>
-        </CardContent>
-      </Card>
+    <!-- Loading State -->
+    <div v-if="pending" class="flex items-center justify-center py-12">
+      <Icon name="lucide:loader-2" class="h-8 w-8 animate-spin text-primary" />
     </div>
 
-    <!-- Tabs -->
-    <Tabs default-value="expenses" class="space-y-4">
-      <TabsList>
-        <TabsTrigger value="expenses">
-          <Icon name="lucide:receipt" class="mr-2 h-4 w-4" />
-          Expenses
-        </TabsTrigger>
-        <TabsTrigger value="milestones">
-          <Icon name="lucide:flag" class="mr-2 h-4 w-4" />
-          Milestones
-        </TabsTrigger>
-        <TabsTrigger value="members">
-          <Icon name="lucide:users" class="mr-2 h-4 w-4" />
-          Members
-        </TabsTrigger>
-      </TabsList>
-
-      <!-- Expenses Tab -->
-      <TabsContent value="expenses" class="space-y-4">
-        <div class="flex justify-between items-center">
-          <h3 class="text-lg font-semibold">Expenses</h3>
-          <Button size="sm">
-            <Icon name="lucide:plus" class="mr-2 h-4 w-4" />
-            Add Expense
-          </Button>
-        </div>
-
-        <Card v-if="!project.expenses || project.expenses.length === 0">
-          <CardContent class="flex flex-col items-center justify-center py-12">
-            <Icon
-              name="lucide:receipt"
-              class="h-12 w-12 text-muted-foreground mb-4"
-            />
-            <p class="text-sm text-muted-foreground">No expenses yet</p>
-          </CardContent>
-        </Card>
-
-        <div v-else class="space-y-4">
-          <!-- Expense list will go here -->
-          <p class="text-sm text-muted-foreground">
-            {{ project.expenses.length }} expenses
-          </p>
-        </div>
-      </TabsContent>
-
-      <!-- Milestones Tab -->
-      <TabsContent value="milestones" class="space-y-4">
-        <div class="flex justify-between items-center">
-          <h3 class="text-lg font-semibold">Milestones</h3>
-          <Button size="sm">
-            <Icon name="lucide:plus" class="mr-2 h-4 w-4" />
-            Add Milestone
-          </Button>
-        </div>
-
-        <Card v-if="!project.milestones || project.milestones.length === 0">
-          <CardContent class="flex flex-col items-center justify-center py-12">
-            <Icon
-              name="lucide:flag"
-              class="h-12 w-12 text-muted-foreground mb-4"
-            />
-            <p class="text-sm text-muted-foreground">No milestones yet</p>
-          </CardContent>
-        </Card>
-
-        <div v-else class="space-y-4">
-          <!-- Milestone list will go here -->
-          <p class="text-sm text-muted-foreground">
-            {{ project.milestones.length }} milestones
-          </p>
-        </div>
-      </TabsContent>
-
-      <!-- Members Tab -->
-      <TabsContent value="members" class="space-y-4">
-        <div class="flex justify-between items-center">
-          <h3 class="text-lg font-semibold">Team Members</h3>
-          <Button size="sm" v-if="isOwner">
-            <Icon name="lucide:user-plus" class="mr-2 h-4 w-4" />
-            Add Member
-          </Button>
-        </div>
-
+    <!-- Project Overview -->
+    <div v-else-if="project" class="space-y-6">
+      <!-- Project Stats -->
+      <div class="grid gap-4 md:grid-cols-4">
         <Card>
-          <CardContent class="pt-6">
-            <div class="space-y-4">
-              <!-- Owner -->
-              <div class="flex items-center justify-between">
-                <div class="flex items-center gap-3">
-                  <div
-                    class="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center"
-                  >
-                    <span class="text-sm font-medium">
-                      {{ project.owner?.name.charAt(0).toUpperCase() }}
-                    </span>
-                  </div>
-                  <div>
-                    <p class="text-sm font-medium">{{ project.owner?.name }}</p>
-                    <p class="text-xs text-muted-foreground">
-                      {{ project.owner?.email }}
-                    </p>
-                  </div>
-                </div>
-                <Badge>Owner</Badge>
-              </div>
-
-              <!-- Members -->
-              <div
-                v-for="member in project.members"
-                :key="member.id"
-                class="flex items-center justify-between"
-              >
-                <div class="flex items-center gap-3">
-                  <div
-                    class="h-10 w-10 rounded-full bg-secondary flex items-center justify-center"
-                  >
-                    <span class="text-sm font-medium">
-                      {{ member.user.name.charAt(0).toUpperCase() }}
-                    </span>
-                  </div>
-                  <div>
-                    <p class="text-sm font-medium">{{ member.user.name }}</p>
-                    <p class="text-xs text-muted-foreground">
-                      {{ member.user.email }}
-                    </p>
-                  </div>
-                </div>
-                <Badge variant="outline">{{ member.role }}</Badge>
-              </div>
+          <CardHeader class="pb-3">
+            <CardTitle class="text-sm font-medium">Project Value</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div class="text-2xl font-bold">
+              {{ formatCurrency(project.projectValue || 0, project.currency) }}
             </div>
           </CardContent>
         </Card>
-      </TabsContent>
-    </Tabs>
+
+        <Card>
+          <CardHeader class="pb-3">
+            <CardTitle class="text-sm font-medium">Total Expenses</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div class="text-2xl font-bold">
+              {{ formatCurrency(totalExpenses, project.currency) }}
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader class="pb-3">
+            <CardTitle class="text-sm font-medium">Net Profit</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div
+              class="text-2xl font-bold"
+              :class="netProfit >= 0 ? 'text-green-600' : 'text-red-600'"
+            >
+              {{ formatCurrency(netProfit, project.currency) }}
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader class="pb-3">
+            <CardTitle class="text-sm font-medium">Profit Margin</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div
+              class="text-2xl font-bold"
+              :class="profitMargin >= 0 ? 'text-green-600' : 'text-red-600'"
+            >
+              {{ profitMargin.toFixed(1) }}%
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      <!-- Tabs -->
+      <Tabs v-model="activeTab" class="w-full">
+        <TabsList class="grid w-full grid-cols-3">
+          <TabsTrigger value="expenses">
+            <Icon name="lucide:receipt" class="mr-2 h-4 w-4" />
+            Expenses
+          </TabsTrigger>
+          <TabsTrigger value="milestones">
+            <Icon name="lucide:flag" class="mr-2 h-4 w-4" />
+            Milestones
+          </TabsTrigger>
+          <TabsTrigger value="members">
+            <Icon name="lucide:users" class="mr-2 h-4 w-4" />
+            Members
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="expenses" class="mt-6">
+          <ExpenseList
+            :project-id="route.params.id as string"
+            :expenses="expenses"
+            :summary="expenseSummary"
+            :currency="project.currency"
+            @refresh="refreshExpenses"
+          />
+        </TabsContent>
+
+        <TabsContent value="milestones" class="mt-6">
+          <MilestoneList
+            :project-id="route.params.id as string"
+            :milestones="milestones"
+            @refresh="refreshMilestones"
+          />
+        </TabsContent>
+
+        <TabsContent value="members" class="mt-6">
+          <MemberList
+            :project-id="route.params.id as string"
+            :owner="projectOwner"
+            :members="members"
+            :is-owner="isOwner"
+            @refresh="refreshMembers"
+          />
+        </TabsContent>
+      </Tabs>
+    </div>
+
+    <!-- Not Found State -->
+    <Card v-else class="py-12">
+      <CardContent class="flex flex-col items-center justify-center space-y-4">
+        <Icon
+          name="lucide:alert-circle"
+          class="h-16 w-16 text-muted-foreground"
+        />
+        <div class="text-center space-y-2">
+          <h3 class="text-xl font-semibold">Project not found</h3>
+          <p class="text-sm text-muted-foreground max-w-sm">
+            The project you're looking for doesn't exist or you don't have
+            access to it.
+          </p>
+        </div>
+        <Button @click="navigateTo('/projects')">
+          <Icon name="lucide:arrow-left" class="mr-2 h-4 w-4" />
+          Back to Projects
+        </Button>
+      </CardContent>
+    </Card>
   </div>
 </template>
 
 <script setup lang="ts">
+import ExpenseList from "~/components/project/ExpenseList.vue";
+import MilestoneList from "~/components/project/MilestoneList.vue";
+import MemberList from "~/components/project/MemberList.vue";
+import { Button } from "~/components/ui/button";
+import { Card, CardHeader, CardTitle, CardContent } from "~/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
+import type {
+  Project,
+  Expense,
+  Milestone,
+  ProjectMember,
+  User,
+} from "~/types/models";
+import { useAuthStore } from "~/stores/auth"; // Adjust the path to your auth store
+
 definePageMeta({
   middleware: "auth",
 });
 
 const route = useRoute();
-const auth = useAuthStore();
-const toast = useToast();
-const { fetchProject, deleteProject } = useProjects();
+const authStore = useAuthStore();
+const { fetchProject } = useProjects();
+const { fetchExpenses } = useExpenses();
+const { fetchMilestones } = useMilestones();
 
-const projectId = route.params.id as string;
+// Get current user from Pinia store
+const currentUser = computed(() => authStore.currentUser);
 
+// Active tab state
+const activeTab = ref("expenses");
+
+// Fetch project details
 const { data: project, pending } = await useAsyncData(
-  `project-${projectId}`,
-  () => fetchProject(projectId)
+  `project-${route.params.id}`,
+  () => fetchProject(route.params.id as string),
+  {
+    default: () => null,
+  }
 );
 
-const isOwner = computed(() => project.value?.ownerId === auth.user?.id);
-
-const statusVariant = computed(() => {
-  const variants: Record<string, any> = {
-    DRAFT: "outline",
-    ACTIVE: "default",
-    COMPLETED: "secondary",
-    ARCHIVED: "destructive",
-  };
-  return variants[project.value?.status || "ACTIVE"] || "default";
+// Check if current user is owner
+const isOwner = computed(() => {
+  return project.value?.ownerId === currentUser.value?.id;
 });
 
-const alertVariant = computed(() => {
-  const level = project.value?.alerts?.budget?.level;
-  if (level === "critical" || level === "danger") return "destructive";
-  return "default";
-});
-
-const alertIcon = computed(() => {
-  const level = project.value?.alerts?.budget?.level;
-  if (level === "critical" || level === "danger")
-    return "lucide:alert-triangle";
-  return "lucide:alert-circle";
-});
-
-const alertTitle = computed(() => {
-  const level = project.value?.alerts?.budget?.level;
-  if (level === "critical") return "Critical Budget Alert";
-  if (level === "danger") return "Budget Alert";
-  if (level === "warning") return "Budget Warning";
-  return "Budget Info";
-});
-
-const profitColor = computed(() => {
-  const profit = project.value?.calculations?.profit || 0;
-  if (profit > 0) return "text-green-600";
-  if (profit < 0) return "text-destructive";
-  return "text-muted-foreground";
-});
-
-const daysRemaining = computed(() => {
-  if (!project.value) return 0;
-  return getDaysRemaining(project.value.deadline);
-});
-
-const daysRemainingText = computed(() => {
-  const days = daysRemaining.value;
-  if (days < 0) return `${Math.abs(days)} days overdue`;
-  if (days === 0) return "Due today";
-  return `${days} days remaining`;
-});
-
-const deadlineColor = computed(() => {
-  const days = daysRemaining.value;
-  if (days < 0) return "text-destructive font-medium";
-  if (days <= 7) return "text-orange-500 font-medium";
-  return "text-muted-foreground";
-});
-
-const handleDelete = async () => {
-  if (
-    !confirm(
-      "Are you sure you want to delete this project? This action cannot be undone."
-    )
-  ) {
-    return;
+// Get project owner
+const projectOwner = computed<User>(() => {
+  if (project.value?.owner) {
+    return project.value.owner;
   }
+  // Fallback if owner is not populated
+  return {
+    id: project.value?.ownerId || "",
+    email: "",
+    name: "Project Owner",
+    createdAt: "",
+  };
+});
 
+// Fetch expenses
+const expenses = ref<Expense[]>([]);
+const expenseSummary = ref<
+  Record<string, { actualTotal: number; count: number }>
+>({});
+
+const loadExpenses = async () => {
   try {
-    await deleteProject(projectId);
-    toast.success("Success", "Project deleted successfully");
-    navigateTo("/projects");
-  } catch (err: any) {
-    toast.error("Error", err.data?.error || "Failed to delete project");
+    const data = await fetchExpenses(route.params.id as string);
+    expenses.value = data.expenses || [];
+    expenseSummary.value = data.summary || {};
+    calculateSummary();
+  } catch (err) {
+    console.error("Failed to fetch expenses:", err);
+    expenses.value = [];
   }
 };
+
+const calculateSummary = () => {
+  const summary: Record<string, { actualTotal: number; count: number }> = {
+    MATERIALS: { actualTotal: 0, count: 0 },
+    MANPOWER: { actualTotal: 0, count: 0 },
+    TOOLS: { actualTotal: 0, count: 0 },
+    OTHER: { actualTotal: 0, count: 0 },
+  };
+
+  expenses.value.forEach((expense) => {
+    const category = expense.category || "OTHER";
+    const cost = Number(expense.actualCost || expense.estimatedCost || 0);
+
+    if (!summary[category]) {
+      summary[category] = { actualTotal: 0, count: 0 };
+    }
+
+    summary[category].actualTotal += cost;
+    summary[category].count += 1;
+  });
+
+  expenseSummary.value = summary;
+};
+
+// Fetch milestones
+const milestones = ref<Milestone[]>([]);
+
+const loadMilestones = async () => {
+  try {
+    const data = await fetchMilestones(route.params.id as string);
+    milestones.value = data.milestones || [];
+  } catch (err) {
+    console.error("Failed to fetch milestones:", err);
+    milestones.value = [];
+  }
+};
+
+// Fetch members
+const members = ref<ProjectMember[]>([]);
+
+const loadMembers = async () => {
+  try {
+    // If project includes members, use those
+    if (project.value?.members) {
+      members.value = project.value.members;
+    }
+  } catch (err) {
+    console.error("Failed to fetch members:", err);
+    members.value = [];
+  }
+};
+
+// Computed values
+const totalExpenses = computed(() => {
+  return expenses.value.reduce((total, expense) => {
+    return total + Number(expense.actualCost || expense.estimatedCost || 0);
+  }, 0);
+});
+
+const netProfit = computed(() => {
+  return (project.value?.projectValue || 0) - totalExpenses.value;
+});
+
+const profitMargin = computed(() => {
+  if (!project.value?.projectValue) return 0;
+  return (netProfit.value / project.value.projectValue) * 100;
+});
+
+// Refresh functions
+const refreshExpenses = async () => {
+  await loadExpenses();
+};
+
+const refreshMilestones = async () => {
+  await loadMilestones();
+};
+
+const refreshMembers = async () => {
+  await loadMembers();
+};
+
+// Load all data on mount
+onMounted(() => {
+  loadExpenses();
+  loadMilestones();
+  loadMembers();
+});
 </script>
