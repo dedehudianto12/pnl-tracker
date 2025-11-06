@@ -22,6 +22,6 @@ export const updateExpenseSchema = z.object({
     actualCost: z.number().positive().optional(),
     isRecurring: z.boolean().optional(),
     recurringInterval: z.enum(["DAILY", "WEEKLY", "MONTHLY"]).optional(),
-    dateIncurred: z.iso.date().optional,
+    dateIncurred: z.iso.date().optional(),
   }),
 });

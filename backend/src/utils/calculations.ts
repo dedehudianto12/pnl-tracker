@@ -1,5 +1,5 @@
-import {Expense, Project} from '@prisma/client';
-import { ProjectCalculations } from '../types/index.js';
+import { Expense, Project } from "@prisma/client";
+import { ProjectCalculations } from "../types/index.js";
 
 export const calculateProjectMetrics = (
   project: Project,

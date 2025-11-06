@@ -47,7 +47,12 @@
           </CardHeader>
           <CardContent>
             <div class="text-2xl font-bold">
-              {{ formatCurrency(project.projectValue || 0, project.currency) }}
+              {{
+                formatCurrency(
+                  Number(project.projectValue) || 0,
+                  project.currency
+                )
+              }}
             </div>
           </CardContent>
         </Card>
