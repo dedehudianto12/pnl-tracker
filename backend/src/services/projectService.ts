@@ -1,8 +1,8 @@
-import prisma from '../config/database.js';
-import { ProjectStatus, MemberRole, Prisma } from '@prisma/client';
-import { calculateProjectMetrics } from '../utils/calculations.js';
-import { generateProjectAlerts } from '../utils/alertCalculations.js';
-import { notificationService } from './notificationService.js';
+import prisma from "../config/database.js";
+import { ProjectStatus, MemberRole, Prisma } from "@prisma/client";
+import { calculateProjectMetrics } from "../utils/calculations.js";
+import { generateProjectAlerts } from "../utils/alertCalculations.js";
+import { notificationService } from "./notificationService.js";
 
 export const projectService = {
   async createProject(
@@ -43,10 +43,7 @@ export const projectService = {
     // Get projects where user is owner or member
     const projects = await prisma.project.findMany({
       where: {
-        OR: [
-          { ownerId: userId },
-          { members: { some: { userId } } },
-        ],
+        OR: [{ ownerId: userId }, { members: { some: { userId } } }],
       },
       include: {
         owner: {
@@ -68,7 +65,7 @@ export const projectService = {
           },
         },
       },
-      orderBy: { createdAt: 'desc' },
+      orderBy: { createdAt: "desc" },
     });
 
     // Calculate metrics for each project
@@ -81,57 +78,54 @@ export const projectService = {
   },
 
   async getProjectById(projectId: string, userId: string) {
-  const project = await prisma.project.findFirst({
-    where: {
-      id: projectId,
-      OR: [
-        { ownerId: userId },
-        { members: { some: { userId } } },
-      ],
-    },
-    include: {
-      owner: {
-        select: { id: true, name: true, email: true },
+    const project = await prisma.project.findFirst({
+      where: {
+        id: projectId,
+        OR: [{ ownerId: userId }, { members: { some: { userId } } }],
       },
-      members: {
-        include: {
-          user: {
-            select: { id: true, name: true, email: true },
+      include: {
+        owner: {
+          select: { id: true, name: true, email: true },
+        },
+        members: {
+          include: {
+            user: {
+              select: { id: true, name: true, email: true },
+            },
           },
         },
+        expenses: {
+          orderBy: { createdAt: "desc" },
+        },
+        milestones: {
+          orderBy: { targetDate: "asc" },
+        },
       },
-      expenses: {
-        orderBy: { createdAt: 'desc' },
-      },
-      milestones: {
-        orderBy: { targetDate: 'asc' },
-      },
-    },
-  });
+    });
 
-  if (!project) {
-    throw new Error('Project not found or access denied');
-  }
+    if (!project) {
+      throw new Error("Project not found or access denied");
+    }
 
-  const calculations = calculateProjectMetrics(project, project.expenses);
-  const alerts = generateProjectAlerts(
-    project,
-    calculations.totalActualCost,
-    calculations.overheadCost
-  );
-
-  // Create notification if budget warning threshold crossed
-  if (alerts.budget && alerts.budget.shouldNotify) {
-    await notificationService.checkAndCreateBudgetWarnings(
-      project.id,
-      project.ownerId,
-      alerts.budget.percentage,
-      project.name
+    const calculations = calculateProjectMetrics(project, project.expenses);
+    const alerts = generateProjectAlerts(
+      project,
+      calculations.totalActualCost,
+      calculations.overheadCost
     );
-  }
 
-  return { ...project, calculations, alerts };
-},
+    // Create notification if budget warning threshold crossed
+    if (alerts.budget && alerts.budget.shouldNotify) {
+      await notificationService.checkAndCreateBudgetWarnings(
+        project.id,
+        project.ownerId,
+        alerts.budget.percentage,
+        project.name
+      );
+    }
+
+    return { ...project, calculations, alerts };
+  },
 
   async updateProject(
     projectId: string,
@@ -151,18 +145,19 @@ export const projectService = {
         id: projectId,
         OR: [
           { ownerId: userId },
-          { members: { some: { userId, role: { in: ['EDITOR'] } } } },
+          { members: { some: { userId, role: { in: ["EDITOR"] } } } },
         ],
       },
     });
 
     if (!project) {
-      throw new Error('Project not found or insufficient permissions');
+      throw new Error("Project not found or insufficient permissions");
     }
 
     const updateData: Prisma.ProjectUpdateInput = {};
     if (data.name) updateData.name = data.name;
-    if (data.description !== undefined) updateData.description = data.description;
+    if (data.description !== undefined)
+      updateData.description = data.description;
     if (data.projectValue) updateData.projectValue = data.projectValue;
     if (data.deadline) updateData.deadline = new Date(data.deadline);
     if (data.overheadPercentage !== undefined)
@@ -192,11 +187,11 @@ export const projectService = {
     });
 
     if (!project) {
-      throw new Error('Project not found or you are not the owner');
+      throw new Error("Project not found or you are not the owner");
     }
 
     await prisma.project.delete({ where: { id: projectId } });
-    return { message: 'Project deleted successfully' };
+    return { message: "Project deleted successfully" };
   },
 
   async addMember(
@@ -211,13 +206,15 @@ export const projectService = {
     });
 
     if (!project) {
-      throw new Error('Project not found or you are not the owner');
+      throw new Error("Project not found or you are not the owner");
     }
 
     // Find user by email
-    const user = await prisma.user.findUnique({ where: { email: memberEmail } });
+    const user = await prisma.user.findUnique({
+      where: { email: memberEmail },
+    });
     if (!user) {
-      throw new Error('User not found');
+      throw new Error("User not found");
     }
 
     // Check if already a member
@@ -231,7 +228,7 @@ export const projectService = {
     });
 
     if (existingMember) {
-      throw new Error('User is already a member of this project');
+      throw new Error("User is already a member of this project");
     }
 
     // Add member
@@ -258,7 +255,7 @@ export const projectService = {
     });
 
     if (!project) {
-      throw new Error('Project not found or you are not the owner');
+      throw new Error("Project not found or you are not the owner");
     }
 
     await prisma.projectMember.delete({
@@ -270,7 +267,7 @@ export const projectService = {
       },
     });
 
-    return { message: 'Member removed successfully' };
+    return { message: "Member removed successfully" };
   },
 
   async updateMemberRole(
@@ -285,7 +282,7 @@ export const projectService = {
     });
 
     if (!project) {
-      throw new Error('Project not found or you are not the owner');
+      throw new Error("Project not found or you are not the owner");
     }
 
     const updatedMember = await prisma.projectMember.update({

@@ -24,15 +24,27 @@ export const calculateProjectMetrics = (
   const projectValue = Number(project.projectValue);
 
   const remainingBudget = projectValue - totalActualCost;
-  const profit = projectValue - totalCostWithOverhead;
-  const profitMargin = projectValue > 0 ? (profit / projectValue) * 100 : 0;
+
+  const grossProfit = projectValue - totalActualCost;
+  const grossProfitMargin =
+    projectValue > 0 ? (grossProfit / projectValue) * 100 : 0;
+
+  const netProfit = projectValue - totalCostWithOverhead;
+  const netProfitMargin =
+    projectValue > 0 ? (netProfit / projectValue) * 100 : 0;
+
+  const budgetPercentage =
+    totalEstimatedCost > 0 ? (totalActualCost / projectValue) * 100 : 0;
 
   return {
     totalEstimatedCost,
     totalActualCost,
     remainingBudget,
-    profit,
-    profitMargin,
+    grossProfit,
+    grossProfitMargin,
+    netProfit,
+    netProfitMargin,
     overheadCost,
+    budgetPercentage,
   };
 };

@@ -114,7 +114,10 @@
                   >{{ milestone.completionPercentage }}%</span
                 >
               </div>
-              <Progress :model-value="milestone.completionPercentage" />
+              <Progress
+                :model-value="milestone.completionPercentage"
+                class="[&>div]:bg-blue-400"
+              />
             </div>
 
             <!-- Meta Info -->
@@ -176,6 +179,7 @@
 <script setup lang="ts">
 import type { Milestone } from "~/types/models";
 import MilestoneDialog from "./MilestoneDialog.vue";
+import Progress from "../ui/progress/Progress.vue";
 
 interface Props {
   projectId: string;

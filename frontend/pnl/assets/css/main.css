@@ -1,9 +1,10 @@
 /**
  * Tailwind CSS v4 Translation
+ * Modern Financial Blue Theme - Professional & Clean
  * * Key Changes:
  * 1. Removed non-standard directives like @plugin, @custom-variant, and @theme inline.
  * 2. Standard CSS features (keyframes, scrollbar) are preserved.
- * 3. Color variables for light and dark modes are preserved in :root and .dark.
+ * 3. Color variables updated to Modern Financial Blue scheme.
  */
 
 @import "tailwindcss";
@@ -18,15 +19,15 @@
 }
 
 ::-webkit-scrollbar-track {
-  @apply bg-gray-100 dark:bg-gray-800; /* Added dark mode for track */
+  @apply bg-slate-100 dark:bg-slate-800; /* Updated to slate for professional look */
 }
 
 ::-webkit-scrollbar-thumb {
-  @apply bg-gray-300 dark:bg-gray-600 rounded; /* Added dark mode for thumb */
+  @apply bg-slate-300 dark:bg-slate-600 rounded;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  @apply bg-gray-400 dark:bg-gray-500;
+  @apply bg-slate-400 dark:bg-slate-500;
 }
 
 /* Custom animations (Standard CSS) */
@@ -45,92 +46,128 @@
   animation: slideIn 0.3s ease-out;
 }
 
-/* * CSS Variable Definitions (OKLCH format retained)
- * These variables are consumed by the shadcn-vue utilities in @layer base.
+/* * CSS Variable Definitions - Modern Financial Blue Theme
+ * Professional color scheme optimized for financial data visualization
  */
 :root {
   --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --destructive-foreground: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
 
-  /* Sidebar and Chart variables */
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: var(--primary); /* Re-used primary for simplicity */
-  --sidebar-primary-foreground: var(--primary-foreground);
-  --sidebar-accent: var(--accent);
-  --sidebar-accent-foreground: var(--accent-foreground);
-  --sidebar-border: var(--border);
-  --sidebar-ring: var(--ring);
+  /* Main colors - Soft blue-gray background with clean whites */
+  --background: oklch(0.985 0.002 240); /* #F8FAFC - Soft gray-blue */
+  --foreground: oklch(0.165 0.015 252); /* #0F172A - Dark slate */
 
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
+  /* Card colors - Clean white cards on soft background */
+  --card: oklch(1 0 0); /* #FFFFFF - Pure white */
+  --card-foreground: oklch(0.165 0.015 252); /* #0F172A - Dark slate */
+
+  /* Popover colors */
+  --popover: oklch(1 0 0); /* #FFFFFF */
+  --popover-foreground: oklch(0.165 0.015 252); /* #0F172A */
+
+  /* Primary colors - Professional blue for actions */
+  --primary: oklch(0.532 0.185 264); /* #2563EB - Professional blue */
+  --primary-foreground: oklch(0.985 0 0); /* #FFFFFF */
+
+  /* Secondary colors - Light slate */
+  --secondary: oklch(0.965 0.003 252); /* #F1F5F9 - Very light slate */
+  --secondary-foreground: oklch(0.165 0.015 252); /* #0F172A */
+
+  /* Muted colors - For subtle text and backgrounds */
+  --muted: oklch(0.965 0.003 252); /* #F1F5F9 */
+  --muted-foreground: oklch(0.525 0.015 252); /* #64748B - Slate gray */
+
+  /* Accent colors - Professional blue accent */
+  --accent: oklch(0.965 0.003 252); /* #F1F5F9 */
+  --accent-foreground: oklch(0.532 0.185 264); /* #2563EB */
+
+  /* Destructive colors - For errors and negative values */
+  --destructive: oklch(0.577 0.215 27); /* #DC2626 - Red */
+  --destructive-foreground: oklch(0.985 0 0); /* #FFFFFF */
+
+  /* Border and input colors - Subtle slate borders */
+  --border: oklch(0.898 0.005 252); /* #E2E8F0 - Light slate border */
+  --input: oklch(0.898 0.005 252); /* #E2E8F0 */
+  --ring: oklch(0.532 0.185 264); /* #2563EB - Matches primary */
+
+  /* Sidebar colors - Darker slate sidebar */
+  --sidebar: oklch(0.185 0.015 252); /* #1E293B - Deep slate */
+  --sidebar-foreground: oklch(0.965 0.003 252); /* #F1F5F9 - Light text */
+  --sidebar-primary: oklch(0.532 0.185 264); /* #2563EB */
+  --sidebar-primary-foreground: oklch(0.985 0 0); /* #FFFFFF */
+  --sidebar-accent: oklch(
+    0.265 0.015 252
+  ); /* #334155 - Slightly lighter slate */
+  --sidebar-accent-foreground: oklch(0.965 0.003 252); /* #F1F5F9 */
+  --sidebar-border: oklch(0.265 0.015 252); /* #334155 */
+  --sidebar-ring: oklch(0.532 0.185 264); /* #2563EB */
+
+  /* Chart colors - Vibrant but professional palette */
+  --chart-1: oklch(0.532 0.185 264); /* Blue - #2563EB */
+  --chart-2: oklch(0.545 0.175 142); /* Emerald - #059669 */
+  --chart-3: oklch(0.615 0.195 305); /* Purple - #9333EA */
+  --chart-4: oklch(0.685 0.205 85); /* Amber - #F59E0B */
+  --chart-5: oklch(0.577 0.215 27); /* Red - #DC2626 */
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.145 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.145 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.985 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.396 0.141 25.723);
-  --destructive-foreground: oklch(0.637 0.237 25.331);
-  --border: oklch(0.269 0 0);
-  --input: oklch(0.269 0 0);
-  --ring: oklch(0.439 0 0);
+  /* Dark theme - Deep slate with bright accents */
+  --background: oklch(0.165 0.015 252); /* #0F172A - Deep slate */
+  --foreground: oklch(0.965 0.003 252); /* #F1F5F9 - Light text */
 
-  /* Sidebar and Chart variables (Dark) */
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(0.269 0 0);
-  --sidebar-ring: oklch(0.439 0 0);
+  /* Card colors - Slightly lighter slate cards */
+  --card: oklch(0.185 0.015 252); /* #1E293B - Card slate */
+  --card-foreground: oklch(0.965 0.003 252); /* #F1F5F9 */
 
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
+  /* Popover colors */
+  --popover: oklch(0.185 0.015 252); /* #1E293B */
+  --popover-foreground: oklch(0.965 0.003 252); /* #F1F5F9 */
+
+  /* Primary colors - Bright blue for dark mode */
+  --primary: oklch(0.598 0.205 264); /* #3B82F6 - Brighter blue */
+  --primary-foreground: oklch(0.985 0 0); /* #FFFFFF */
+
+  /* Secondary colors */
+  --secondary: oklch(0.265 0.015 252); /* #334155 */
+  --secondary-foreground: oklch(0.965 0.003 252); /* #F1F5F9 */
+
+  /* Muted colors */
+  --muted: oklch(0.265 0.015 252); /* #334155 */
+  --muted-foreground: oklch(0.625 0.015 252); /* #94A3B8 - Light slate */
+
+  /* Accent colors */
+  --accent: oklch(0.265 0.015 252); /* #334155 */
+  --accent-foreground: oklch(0.598 0.205 264); /* #3B82F6 */
+
+  /* Destructive colors - Brighter for dark mode */
+  --destructive: oklch(0.577 0.215 27); /* #DC2626 */
+  --destructive-foreground: oklch(0.985 0 0); /* #FFFFFF */
+
+  /* Border and input colors */
+  --border: oklch(0.265 0.015 252); /* #334155 */
+  --input: oklch(0.265 0.015 252); /* #334155 */
+  --ring: oklch(0.598 0.205 264); /* #3B82F6 */
+
+  /* Sidebar colors - Darkest slate */
+  --sidebar: oklch(0.145 0.015 252); /* #0B1120 - Even darker */
+  --sidebar-foreground: oklch(0.965 0.003 252); /* #F1F5F9 */
+  --sidebar-primary: oklch(0.598 0.205 264); /* #3B82F6 */
+  --sidebar-primary-foreground: oklch(0.985 0 0); /* #FFFFFF */
+  --sidebar-accent: oklch(0.265 0.015 252); /* #334155 */
+  --sidebar-accent-foreground: oklch(0.965 0.003 252); /* #F1F5F9 */
+  --sidebar-border: oklch(0.265 0.015 252); /* #334155 */
+  --sidebar-ring: oklch(0.598 0.205 264); /* #3B82F6 */
+
+  /* Chart colors - Brighter versions for dark mode */
+  --chart-1: oklch(0.598 0.205 264); /* Bright blue - #3B82F6 */
+  --chart-2: oklch(0.625 0.195 142); /* Bright emerald - #10B981 */
+  --chart-3: oklch(0.685 0.215 305); /* Bright purple - #A855F7 */
+  --chart-4: oklch(0.755 0.225 85); /* Bright amber - #FBBF24 */
+  --chart-5: oklch(0.647 0.235 27); /* Bright red - #EF4444 */
 }
 
 /* Base styles using the CSS variables */
 @layer base {
   * {
-    /* * In Tailwind v4, explicit use of @apply is often replaced by config,
-     * but for migrating custom CSS, it is retained.
-     */
     @apply border-border outline-ring/50;
   }
   body {

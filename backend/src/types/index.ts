@@ -1,4 +1,4 @@
-import { Request } from 'express';
+import { Request } from "express";
 
 export interface AuthRequest extends Request {
   userId?: string;
@@ -13,13 +13,16 @@ export interface ProjectCalculations {
   totalEstimatedCost: number;
   totalActualCost: number;
   remainingBudget: number;
-  profit: number;
-  profitMargin: number;
+  netProfit: number;
+  netProfitMargin: number;
+  grossProfit: number;
+  grossProfitMargin: number;
   overheadCost: number;
+  budgetPercentage: number;
 }
 
 export interface BudgetAlert {
-  level: 'info' | 'warning' | 'danger' | 'critical';
+  level: "info" | "warning" | "danger" | "critical";
   percentage: number;
   message: string;
   shouldNotify: boolean;

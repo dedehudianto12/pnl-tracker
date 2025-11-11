@@ -5,7 +5,7 @@
   >
     <!-- Header -->
     <header
-      class="bg-card dark:bg-card border-b border-border sticky top-0 z-40 shadow-sm"
+      class="bg-background dark:bg-card border-b border-border sticky top-0 z-40 shadow-sm"
     >
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between items-center h-16">
@@ -22,14 +22,14 @@
             <NuxtLink
               to="/"
               active-class="text-primary border-b-2 border-primary"
-              class="text-muted-foreground hover:text-green-500 px-3 py-2 text-sm font-medium transition-colors"
+              class="text-muted-foreground px-3 py-2 text-sm font-medium transition-colors"
             >
               Dashboard
             </NuxtLink>
             <NuxtLink
               to="/projects"
               active-class="text-primary border-b-2 border-primary"
-              class="text-muted-foreground hover:text-green-500 px-3 py-2 text-sm font-medium transition-colors"
+              class="text-muted-foreground px-3 py-2 text-sm font-medium transition-colors"
             >
               Projects
             </NuxtLink>
@@ -44,7 +44,7 @@
             <DropdownMenu>
               <DropdownMenuTrigger as-child>
                 <!-- Replaces UButton -->
-                <Button variant="ghost" class="gap-2">
+                <Button variant="ghost" class="gap-2 text-foreground">
                   {{ auth.user?.name || "User" }}
                   <Icon name="lucide:chevron-down" class="w-4 h-4" />
                 </Button>
@@ -83,7 +83,7 @@
     </header>
 
     <!-- Main content -->
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 bg-background">
       <slot />
     </main>
 

@@ -84,9 +84,12 @@ export interface ProjectCalculations {
   totalEstimatedCost: number;
   totalActualCost: number;
   remainingBudget: number;
-  profit: number;
-  profitMargin: number;
+  netProfit: number;
+  netProfitMargin: number;
+  grossProfit: number;
+  grossProfitMargin: number;
   overheadCost: number;
+  budgetPercentage: number;
 }
 
 export interface BudgetAlert {

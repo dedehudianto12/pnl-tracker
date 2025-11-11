@@ -4,13 +4,15 @@
     <div v-if="summary" class="grid gap-4 md:grid-cols-4">
       <Card v-for="category in categoryList" :key="category.value">
         <CardHeader class="pb-3">
-          <CardTitle class="text-sm font-medium flex items-center gap-2">
+          <CardTitle
+            class="text-sm font-medium flex items-center gap-2 text-muted-foreground"
+          >
             <Icon :name="category.icon" class="h-4 w-4 text-muted-foreground" />
             {{ category.label }}
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div class="text-xl font-bold">
+          <div class="text-foreground font-bold text-xl">
             {{
               formatCurrency(
                 summary[category.value]?.actualTotal || 0,
@@ -30,12 +32,19 @@
       <CardHeader>
         <div class="flex items-center justify-between">
           <div>
-            <CardTitle>All Expenses</CardTitle>
-            <CardDescription>
+            <CardTitle class="text-foreground font-semibold text-lg"
+              >All Expenses</CardTitle
+            >
+            <CardDescription class="text-muted-foreground text-sm">
               {{ expenses.length }} total expenses
             </CardDescription>
           </div>
-          <Button size="sm" @click="openAddDialog">
+          <Button
+            v-if="role !== 'VIEWER'"
+            size="sm"
+            @click="openAddDialog"
+            class="bg-primary hover:bg-primary/90"
+          >
             <Icon name="lucide:plus" class="mr-2 h-4 w-4" />
             Add Expense
           </Button>
@@ -162,6 +171,7 @@ import ExpenseDialog from "./ExpenseDialog.vue";
 interface Props {
   projectId: string;
   expenses: Expense[];
+  role: string | null;
   summary: any;
   currency: string;
 }

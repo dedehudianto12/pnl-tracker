@@ -214,7 +214,7 @@ const emit = defineEmits<{
 }>();
 
 const toast = useToast();
-const { removeMember } = useProjects();
+const { removeMember, updateMemberRole } = useProjects();
 
 const isAddDialogOpen = ref(false);
 const isChangeRoleOpen = ref(false);
@@ -257,8 +257,18 @@ const handleChangeRole = async () => {
   if (!selectedMember.value) return;
 
   try {
-    // This would call updateMemberRole from your API
-    // For now, we'll just show a toast
+    await updateMemberRole(
+      props.projectId,
+      selectedMember.value.userId,
+      newRole.value
+    );
+    const memberToUpdate = props.members.find(
+      (m) => m.userId === selectedMember.value!.userId
+    );
+
+    if (memberToUpdate) {
+      memberToUpdate.role = newRole.value;
+    }
     toast.success("Success", "Member role updated successfully");
     isChangeRoleOpen.value = false;
     emit("refresh");

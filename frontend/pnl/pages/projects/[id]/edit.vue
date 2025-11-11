@@ -227,7 +227,7 @@
 </template>
 
 <script setup lang="ts">
-import { Form, useForm } from "vee-validate";
+import { useForm } from "vee-validate";
 import { toTypedSchema } from "@vee-validate/zod";
 import {
   UpdateProjectSchema,
@@ -256,28 +256,28 @@ const { data: project, pending } = await useAsyncData(
 const isOwner = computed(() => project.value?.ownerId === auth.user?.id);
 
 // Redirect if not owner
-// watch(
-//   [isOwner, pending],
-//   ([newIsOwner, newPending]) => {
-//     // 1. Wait until data fetching is complete
-//     if (newPending) {
-//       return;
-//     }
+watch(
+  [isOwner, pending],
+  ([newIsOwner, newPending]) => {
+    // 1. Wait until data fetching is complete
+    if (newPending) {
+      return;
+    }
 
-//     // 2. Perform the redirect check only after data is loaded and isOwner is confirmed false
-//     if (!newIsOwner) {
-//       // Use nextTick to ensure redirect happens outside the hydration flow
-//       nextTick(() => {
-//         toast.error(
-//           "Access Denied",
-//           "Only the project owner can edit this project"
-//         );
-//         navigateTo(`/projects/${projectId}`);
-//       });
-//     }
-//   },
-//   { immediate: true }
-// ); // Keep immediate: true to run the check right after loading.
+    // 2. Perform the redirect check only after data is loaded and isOwner is confirmed false
+    if (!newIsOwner) {
+      // Use nextTick to ensure redirect happens outside the hydration flow
+      nextTick(() => {
+        toast.error(
+          "Access Denied",
+          "Only the project owner can edit this project"
+        );
+        navigateTo(`/projects/${projectId}`);
+      });
+    }
+  },
+  { immediate: true }
+); // Keep immediate: true to run the check right after loading.
 
 // Form setup
 const formSchema = toTypedSchema(UpdateProjectSchema);

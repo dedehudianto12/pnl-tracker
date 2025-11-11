@@ -4,8 +4,8 @@
   >
     <div class="max-w-md w-full">
       <div class="text-center mb-8">
-        <h1 class="text-4xl font-bold text-white mb-2">PNL Tracker</h1>
-        <p class="text-primary-100">Project Profit & Loss Management</p>
+        <h1 class="text-4xl font-bold text-primary mb-2">PNL Tracker</h1>
+        <p class="text-foreground">Project Profit & Loss Management</p>
       </div>
 
       <div class="bg-white rounded-lg shadow-xl p-8">

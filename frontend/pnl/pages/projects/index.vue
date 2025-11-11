@@ -3,7 +3,9 @@
     <!-- Header -->
     <div class="flex items-center justify-between">
       <div>
-        <h1 class="text-3xl font-bold tracking-tight">Projects</h1>
+        <h1 class="text-3xl font-bold tracking-tight text-foreground">
+          Projects
+        </h1>
         <p class="text-muted-foreground mt-1">
           Manage all your projects in one place
         </p>

@@ -27,8 +27,8 @@ export const ALERT_COLORS = {
 } as const;
 
 export const CURRENCIES = [
-  { value: "USD", label: "USD ($)", symbol: "$" },
-  { value: "EUR", label: "EUR (€)", symbol: "€" },
-  { value: "GBP", label: "GBP (£)", symbol: "£" },
+  //   { value: "USD", label: "USD ($)", symbol: "$" },
+  //   { value: "EUR", label: "EUR (€)", symbol: "€" },
+  //   { value: "GBP", label: "GBP (£)", symbol: "£" },
   { value: "IDR", label: "IDR (Rp)", symbol: "Rp" },
 ] as const;

@@ -45,6 +45,17 @@ export const useProjects = () => {
     });
   };
 
+  const updateMemberRole = async (
+    projectId: string,
+    memberId: string,
+    role: string
+  ) => {
+    return await apiFetch(`/projects/${projectId}/members/${memberId}`, {
+      method: "PUT",
+      body: { role },
+    });
+  };
+
   return {
     fetchProjects,
     fetchProject,
@@ -53,5 +64,6 @@ export const useProjects = () => {
     deleteProject,
     addMember,
     removeMember,
+    updateMemberRole,
   };
 };

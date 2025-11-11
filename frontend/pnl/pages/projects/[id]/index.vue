@@ -7,12 +7,12 @@
           variant="ghost"
           size="sm"
           @click="navigateTo('/projects')"
-          class="mb-2"
+          class="mb-2 text-muted-foreground"
         >
           <Icon name="lucide:arrow-left" class="mr-2 h-4 w-4" />
           Back to Projects
         </Button>
-        <h1 class="text-3xl font-bold tracking-tight">
+        <h1 class="text-3xl font-bold tracking-tight text-foreground">
           {{ project?.name || "Project Details" }}
         </h1>
         <p class="text-muted-foreground mt-1">
@@ -23,10 +23,12 @@
       </div>
       <div class="flex gap-2">
         <Button
+          v-if="userRole === 'EDITOR' || isOwner"
           variant="outline"
           @click="navigateTo(`/projects/${route.params.id}/edit`)"
+          class="text-foreground bg-card border border-border hover:bg-secondary"
         >
-          <Icon name="lucide:edit" class="mr-2 h-4 w-4" />
+          <Icon name="lucide:edit" class="mr-2 h-4 w-4 text-muted-foreground" />
           Edit Project
         </Button>
       </div>
@@ -43,10 +45,12 @@
       <div class="grid gap-4 md:grid-cols-4">
         <Card>
           <CardHeader class="pb-3">
-            <CardTitle class="text-sm font-medium">Project Value</CardTitle>
+            <CardTitle class="text-muted-foreground text-sm font-medium"
+              >Project Value</CardTitle
+            >
           </CardHeader>
           <CardContent>
-            <div class="text-2xl font-bold">
+            <div class="text-foreground font-bold text-2xl">
               {{
                 formatCurrency(
                   Number(project.projectValue) || 0,
@@ -59,10 +63,12 @@
 
         <Card>
           <CardHeader class="pb-3">
-            <CardTitle class="text-sm font-medium">Total Expenses</CardTitle>
+            <CardTitle class="text-muted-foreground text-sm font-medium"
+              >Total Expenses</CardTitle
+            >
           </CardHeader>
           <CardContent>
-            <div class="text-2xl font-bold">
+            <div class="text-foreground font-bold text-2xl">
               {{ formatCurrency(totalExpenses, project.currency) }}
             </div>
           </CardContent>
@@ -70,21 +76,100 @@
 
         <Card>
           <CardHeader class="pb-3">
-            <CardTitle class="text-sm font-medium">Net Profit</CardTitle>
+            <CardTitle class="text-muted-foreground text-sm font-medium"
+              >Net Profit</CardTitle
+            >
           </CardHeader>
           <CardContent>
             <div
               class="text-2xl font-bold"
               :class="netProfit >= 0 ? 'text-green-600' : 'text-red-600'"
             >
-              {{ formatCurrency(netProfit, project.currency) }}
+              {{
+                formatCurrency(
+                  project.calculations?.netProfit || 0,
+                  project.currency
+                )
+              }}
             </div>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader class="pb-3">
-            <CardTitle class="text-sm font-medium">Profit Margin</CardTitle>
+            <CardTitle class="text-muted-foreground text-sm font-medium"
+              >Net Profit Margin</CardTitle
+            >
+          </CardHeader>
+          <CardContent>
+            <div
+              class="text-2xl font-bold"
+              :class="profitMargin >= 0 ? 'text-green-600' : 'text-red-600'"
+            >
+              {{ project.calculations?.netProfitMargin.toFixed(1) }}%
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader class="pb-3">
+            <CardTitle class="text-muted-foreground text-sm font-medium"
+              >Due Date</CardTitle
+            >
+          </CardHeader>
+          <CardContent>
+            <div class="text-foreground font-bold text-2xl">
+              {{ project.deadline ? formatDate(project.deadline) : "N/A" }}
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader class="pb-3">
+            <CardTitle class="text-muted-foreground text-sm font-medium"
+              >Overhead Cost</CardTitle
+            >
+          </CardHeader>
+          <CardContent>
+            <div class="text-foreground font-bold text-2xl">
+              {{
+                project.calculations?.overheadCost
+                  ? formatCurrency(
+                      project.calculations.overheadCost,
+                      project.currency
+                    )
+                  : formatCurrency(0, project.currency)
+              }}
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader class="pb-3">
+            <CardTitle class="text-muted-foreground text-sm font-medium"
+              >Gross Profit</CardTitle
+            >
+          </CardHeader>
+          <CardContent>
+            <div
+              class="text-2xl font-bold"
+              :class="netProfit >= 0 ? 'text-green-600' : 'text-red-600'"
+            >
+              {{
+                formatCurrency(
+                  project.calculations?.grossProfit || 0,
+                  project.currency
+                )
+              }}
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader class="pb-3">
+            <CardTitle class="text-muted-foreground text-sm font-medium"
+              >Gross Profit Margin</CardTitle
+            >
           </CardHeader>
           <CardContent>
             <div
@@ -118,6 +203,7 @@
           <ExpenseList
             :project-id="route.params.id as string"
             :expenses="expenses"
+            :role="userRole"
             :summary="expenseSummary"
             :currency="project.currency"
             @refresh="refreshExpenses"
@@ -171,9 +257,6 @@
 import ExpenseList from "~/components/project/ExpenseList.vue";
 import MilestoneList from "~/components/project/MilestoneList.vue";
 import MemberList from "~/components/project/MemberList.vue";
-import { Button } from "~/components/ui/button";
-import { Card, CardHeader, CardTitle, CardContent } from "~/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import type {
   Project,
   Expense,
@@ -283,6 +366,7 @@ const loadMilestones = async () => {
 
 // Fetch members
 const members = ref<ProjectMember[]>([]);
+const userRole = ref<string | null>(null);
 
 const loadMembers = async () => {
   try {
@@ -290,6 +374,12 @@ const loadMembers = async () => {
     if (project.value?.members) {
       members.value = project.value.members;
     }
+
+    const foundMember = members.value.find(
+      (m) => m.userId === currentUser.value?.id
+    );
+
+    userRole.value = foundMember?.role ?? null;
   } catch (err) {
     console.error("Failed to fetch members:", err);
     members.value = [];

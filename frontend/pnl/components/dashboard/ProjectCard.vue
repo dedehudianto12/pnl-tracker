@@ -6,8 +6,10 @@
     <CardHeader>
       <div class="flex justify-between items-start">
         <div class="space-y-1 flex-1">
-          <CardTitle class="text-lg">{{ project.name }}</CardTitle>
-          <CardDescription class="line-clamp-2">
+          <CardTitle class="text-lg text-foreground font-semibold">{{
+            project.name
+          }}</CardTitle>
+          <CardDescription class="line-clamp-2 text-muted-foreground">
             {{ project.description || "No description" }}
           </CardDescription>
         </div>
@@ -30,7 +32,9 @@
       <div class="space-y-2">
         <div class="flex justify-between items-center text-sm">
           <span class="text-muted-foreground">Budget Usage</span>
-          <span class="font-medium"> {{ budgetPercentage }}% </span>
+          <span class="font-medium text-foreground">
+            {{ budgetPercentage }}%
+          </span>
         </div>
         <Progress :model-value="budgetPercentage" :class="progressColor" />
         <div class="flex justify-between text-xs text-muted-foreground">
@@ -49,20 +53,40 @@
       <!-- Metrics Grid -->
       <div class="grid grid-cols-2 gap-4">
         <div class="space-y-1">
-          <p class="text-xs text-muted-foreground">Profit</p>
+          <p class="text-xs text-muted-foreground">Net Profit</p>
           <p :class="['text-sm font-semibold', profitColor]">
             {{
               formatCurrency(
-                project.calculations?.profit || 0,
+                project.calculations?.netProfit || 0,
                 project.currency
               )
             }}
           </p>
         </div>
         <div class="space-y-1">
-          <p class="text-xs text-muted-foreground">Margin</p>
+          <p class="text-xs text-muted-foreground">Net Margin</p>
           <p :class="['text-sm font-semibold', profitColor]">
-            {{ (project.calculations?.profitMargin || 0).toFixed(1) }}%
+            {{ (project.calculations?.netProfitMargin || 0).toFixed(1) }}%
+          </p>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 gap-4">
+        <div class="space-y-1">
+          <p class="text-xs text-muted-foreground">Gross Profit</p>
+          <p :class="['text-sm font-semibold', profitColor]">
+            {{
+              formatCurrency(
+                project.calculations?.grossProfit || 0,
+                project.currency
+              )
+            }}
+          </p>
+        </div>
+        <div class="space-y-1">
+          <p class="text-xs text-muted-foreground">Gross Margin</p>
+          <p :class="['text-sm font-semibold', profitColor]">
+            {{ (project.calculations?.grossProfitMargin || 0).toFixed(1) }}%
           </p>
         </div>
       </div>
@@ -94,7 +118,7 @@
       <Button
         variant="ghost"
         size="sm"
-        class="w-full"
+        class="w-full text-primary hover:bg-primary/20"
         @click.stop="navigateTo(`/projects/${project.id}`)"
       >
         View Details
@@ -107,10 +131,15 @@
 <script setup lang="ts">
 import type { Project } from "~/types/models";
 import Badge from "../ui/badge/Badge.vue";
+import Alert from "../ui/alert/Alert.vue";
+import AlertDescription from "../ui/alert/AlertDescription.vue";
+import Progress from "../ui/progress/Progress.vue";
 
 const props = defineProps<{
   project: Project;
 }>();
+
+const progress = ref(13);
 
 // Status badge variant
 const statusVariant = computed(() => {
@@ -128,7 +157,8 @@ const statusVariant = computed(() => {
 
 // Budget calculations
 const budgetPercentage = computed(() => {
-  return Math.round(props.project.alerts?.budget?.percentage || 0);
+  const percentage = props.project.calculations?.budgetPercentage || 0;
+  return Number(percentage.toFixed(2));
 });
 
 const totalSpent = computed(() => {
@@ -137,10 +167,10 @@ const totalSpent = computed(() => {
 
 const progressColor = computed(() => {
   const percentage = budgetPercentage.value;
-  if (percentage >= 90) return "text-destructive";
-  if (percentage >= 75) return "text-orange-500";
-  if (percentage >= 50) return "text-yellow-500";
-  return "text-primary";
+  if (percentage >= 90) return "[&>div]:bg-destructive";
+  if (percentage >= 75) return "[&>div]:bg-orange-500";
+  if (percentage >= 50) return "[&>div]:bg-yellow-500";
+  return "[&>div]:bg-emerald-600";
 });
 
 // Alert variant
@@ -162,7 +192,7 @@ const alertIcon = computed(() => {
 
 // Profit color
 const profitColor = computed(() => {
-  const profit = props.project.calculations?.profit || 0;
+  const profit = props.project.calculations?.netProfit || 0;
   if (profit > 0) return "text-green-600";
   if (profit < 0) return "text-destructive";
   return "text-muted-foreground";

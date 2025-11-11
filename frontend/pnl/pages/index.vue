@@ -2,7 +2,9 @@
   <div class="space-y-10">
     <!-- Header -->
     <div>
-      <h1 class="text-3xl font-bold tracking-tight">Dashboard</h1>
+      <h1 class="text-3xl font-bold tracking-tight text-foreground">
+        Dashboard
+      </h1>
       <p class="text-muted-foreground mt-1">
         Welcome back, {{ auth.user?.name }}!
       </p>
@@ -10,15 +12,17 @@
 
     <!-- Stats Cards -->
     <div v-if="!pending" class="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-      <Card>
+      <Card class="bg-card border border-border">
         <CardHeader
           class="flex flex-row items-center justify-between space-y-0 pb-2"
         >
-          <CardTitle class="text-sm font-medium">Total Projects</CardTitle>
-          <Icon name="lucide:briefcase" class="h-4 w-4 text-cyan-400" />
+          <CardTitle class="text-sm font-medium text-muted-foreground"
+            >Total Projects</CardTitle
+          >
+          <Icon name="lucide:briefcase" class="h-4 w-4 text-primary" />
         </CardHeader>
         <CardContent>
-          <div class="text-2xl font-bold text-cyan-400">
+          <div class="text-2xl font-bold text-foreground">
             {{ projects.length }}
           </div>
           <p class="text-xs text-muted-foreground mt-1">
@@ -31,11 +35,13 @@
         <CardHeader
           class="flex flex-row items-center justify-between space-y-0 pb-2"
         >
-          <CardTitle class="text-sm font-medium">Active Projects</CardTitle>
-          <Icon name="lucide:check-circle" class="h-4 w-4 text-green-600" />
+          <CardTitle class="text-sm font-medium text-muted-foreground"
+            >Active Projects</CardTitle
+          >
+          <Icon name="lucide:check-circle" class="h-4 w-4 text-primary" />
         </CardHeader>
         <CardContent>
-          <div class="text-2xl font-bold text-green-600">
+          <div class="text-2xl font-bold text-foreground">
             {{ activeProjects }}
           </div>
           <p class="text-xs text-muted-foreground mt-1">
@@ -49,10 +55,12 @@
           class="flex flex-row items-center justify-between space-y-0 pb-2"
         >
           <CardTitle class="text-sm font-medium">Total Budget</CardTitle>
-          <Icon name="lucide:banknote" class="h-4 w-4 text-cyan-400" />
+          <Icon name="lucide:banknote" class="h-4 w-4 text-green-600" />
         </CardHeader>
         <CardContent>
-          <div class="text-2xl font-bold text-cyan-400">{{ totalBudget }}</div>
+          <div class="text-2xl font-bold text-emerald-600">
+            {{ totalBudget }}
+          </div>
           <p class="text-xs text-muted-foreground mt-1">Across all projects</p>
         </CardContent>
       </Card>
@@ -65,7 +73,9 @@
           <Icon name="lucide:trending-up" class="h-4 w-4 text-green-600" />
         </CardHeader>
         <CardContent>
-          <div class="text-2xl font-bold text-green-600">{{ totalProfit }}</div>
+          <div class="text-2xl font-bold text-emerald-600">
+            {{ totalProfit }}
+          </div>
           <p class="text-xs text-muted-foreground mt-1">Net profit to date</p>
         </CardContent>
       </Card>
@@ -74,7 +84,9 @@
     <!-- Projects Section -->
     <div class="space-y-4">
       <div class="flex items-center justify-between">
-        <h2 class="text-2xl font-semibold tracking-tight">Your Projects</h2>
+        <h2 class="text-foreground font-semibold text-xl tracking-tight">
+          Your Projects
+        </h2>
         <Button @click="navigateTo('/projects/new')">
           <Icon name="lucide:plus" class="mr-2 h-4 w-4" />
           New Project
@@ -155,7 +167,7 @@ const totalBudget = computed(() => {
 const totalProfit = computed(() => {
   const total =
     projects.value?.reduce((sum, p) => {
-      return sum + (p.calculations?.profit || 0);
+      return sum + (p.calculations?.netProfit || 0);
     }, 0) || 0;
   return formatCurrency(total, "IDR");
 });
