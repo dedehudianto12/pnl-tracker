@@ -39,7 +39,7 @@
           <div class="flex items-center space-x-4">
             <!-- Notifications (Kept as is) -->
             <!-- <NotificationDropdown /> -->
-
+            <ThemeSwitcher />
             <!-- User Menu (Replaces UDropdown) -->
             <DropdownMenu>
               <DropdownMenuTrigger as-child>
@@ -93,6 +93,8 @@
 </template>
 
 <script setup lang="ts">
+import ThemeSwitcher from "~/components/theme/ThemeSwitcher.vue";
+
 // Assuming these imports/utilities are correctly defined:
 // 1. Your custom store
 const auth = useAuthStore();

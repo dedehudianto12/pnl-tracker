@@ -71,7 +71,7 @@
               <!-- Info -->
               <div class="flex-1 min-w-0">
                 <div class="flex items-center gap-2">
-                  <p class="font-medium">{{ expense.name }}</p>
+                  <p class="font-medium text-foreground">{{ expense.name }}</p>
                   <Badge
                     v-if="expense.isRecurring"
                     variant="outline"
@@ -95,7 +95,7 @@
               <!-- Costs -->
               <div class="text-right space-y-1">
                 <div>
-                  <p class="text-sm font-medium">
+                  <p class="text-foreground text-sm font-medium">
                     {{
                       formatCurrency(
                         Number(expense.actualCost || expense.estimatedCost),

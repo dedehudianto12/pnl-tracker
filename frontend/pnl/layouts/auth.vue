@@ -8,7 +8,7 @@
         <p class="text-foreground">Project Profit & Loss Management</p>
       </div>
 
-      <div class="bg-white rounded-lg shadow-xl p-8">
+      <div class="rounded-lg shadow-xl">
         <slot />
       </div>
 

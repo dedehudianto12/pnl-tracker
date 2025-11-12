@@ -4,19 +4,25 @@
     <div class="grid gap-4 md:grid-cols-3">
       <Card>
         <CardHeader class="pb-3">
-          <CardTitle class="text-sm font-medium">Total Milestones</CardTitle>
+          <CardTitle class="text-sm font-medium text-muted-foreground"
+            >Total Milestones</CardTitle
+          >
         </CardHeader>
         <CardContent>
-          <div class="text-2xl font-bold">{{ milestones.length }}</div>
+          <div class="text-2xl font-bold text-foreground">
+            {{ milestones.length }}
+          </div>
         </CardContent>
       </Card>
 
       <Card>
         <CardHeader class="pb-3">
-          <CardTitle class="text-sm font-medium">Completed</CardTitle>
+          <CardTitle class="text-sm font-medium text-muted-foreground"
+            >Completed</CardTitle
+          >
         </CardHeader>
         <CardContent>
-          <div class="text-2xl font-bold text-green-600">
+          <div class="text-2xl font-bold text-foreground">
             {{ completedCount }}
           </div>
           <p class="text-xs text-muted-foreground mt-1">
@@ -27,10 +33,14 @@
 
       <Card>
         <CardHeader class="pb-3">
-          <CardTitle class="text-sm font-medium">Average Progress</CardTitle>
+          <CardTitle class="text-sm font-medium text-muted-foreground"
+            >Average Progress</CardTitle
+          >
         </CardHeader>
         <CardContent>
-          <div class="text-2xl font-bold">{{ avgProgress }}%</div>
+          <div class="text-2xl font-bold text-foreground">
+            {{ avgProgress }}%
+          </div>
           <Progress :model-value="avgProgress" class="mt-2" />
         </CardContent>
       </Card>
