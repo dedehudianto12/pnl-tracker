@@ -15,9 +15,7 @@ export default defineNuxtConfig({
   // Runtime config for environment variables
   runtimeConfig: {
     public: {
-      apiBase:
-        process.env.NUXT_PUBLIC_API_BASE ||
-        "https://pnl-tracker.up.railway.app/api/v1",
+      apiBase: process.env.NUXT_PUBLIC_API_BASE || "http://localhost:5000",
     },
   },
 

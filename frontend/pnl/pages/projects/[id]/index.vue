@@ -42,7 +42,10 @@
     <!-- Project Overview -->
     <div v-else-if="project" class="space-y-6">
       <!-- Project Stats -->
-      <div class="grid gap-4 md:grid-cols-4">
+      <div
+        v-if="userRole === 'EDITOR' || isOwner"
+        class="grid gap-4 md:grid-cols-4"
+      >
         <Card>
           <CardHeader class="pb-3">
             <CardTitle class="text-muted-foreground text-sm font-medium"
