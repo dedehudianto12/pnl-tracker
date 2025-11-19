@@ -11,7 +11,6 @@
 import { Toaster } from "./components/ui/sonner";
 import "vue-sonner/style.css";
 import { useTheme } from "./composables/useTheme";
-// Load user on app mount
 const auth = useAuthStore();
 const { initTheme, watchSystemTheme } = useTheme();
 
@@ -22,7 +21,6 @@ onMounted(() => {
   }
 
   initTheme();
-  // Optional: Watch system theme changes
   watchSystemTheme();
 });
 </script>

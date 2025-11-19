@@ -78,6 +78,7 @@
 <script setup lang="ts">
 import { Button } from "~/components/ui/button";
 import Badge from "../ui/badge/Badge.vue";
+import NotificationItem from "./NotificationItem.vue";
 
 const notificationStore = useNotificationsStore();
 
@@ -89,15 +90,12 @@ const unreadCount = computed(() => notificationStore.unreadCount);
 onMounted(() => {
   notificationStore.fetchUnreadCount();
   notificationStore.fetchNotifications("UNREAD");
-});
-
-// Refresh every 30 seconds
-const refreshInterval = setInterval(() => {
-  notificationStore.fetchUnreadCount();
-}, 30000);
-
-onUnmounted(() => {
-  clearInterval(refreshInterval);
+  const refreshInterval = setInterval(() => {
+    notificationStore.fetchUnreadCount();
+  }, 30000);
+  onUnmounted(() => {
+    clearInterval(refreshInterval);
+  });
 });
 
 const markAllAsRead = async () => {

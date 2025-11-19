@@ -63,10 +63,10 @@
                 <DropdownMenuSeparator />
 
                 <!-- Profile Link -->
-                <DropdownMenuItem @click="navigateTo('/profile')">
+                <!-- <DropdownMenuItem @click="navigateTo('/profile')">
                   <Icon name="lucide:user" class="mr-2 h-4 w-4" />
                   <span>Profile</span>
-                </DropdownMenuItem>
+                </DropdownMenuItem> -->
 
                 <DropdownMenuSeparator />
 
@@ -93,6 +93,7 @@
 </template>
 
 <script setup lang="ts">
+import NotificationDropdown from "~/components/notifications/NotificationDropdown.vue";
 import ThemeSwitcher from "~/components/theme/ThemeSwitcher.vue";
 
 // Assuming these imports/utilities are correctly defined:
